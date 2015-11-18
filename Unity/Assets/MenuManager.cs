@@ -3,6 +3,10 @@ using System.Collections;
 
 public class MenuManager : MonoBehaviour {
 
+	public GameObject play_button;
+	public GameObject rules_button;
+	public GameObject ok_button;
+	public GameObject rules_text;
 
 
 	// Use this for initialization
@@ -17,5 +21,19 @@ public class MenuManager : MonoBehaviour {
 
 	public void switchScene(){
 		Application.LoadLevel ("TTN Gameplay");
+	}
+
+	public void showRules(){
+		play_button.SetActive(false);
+		rules_button.SetActive (false);
+		ok_button.SetActive(true); 
+		rules_text.SetActive(true);
+	}
+
+	public void okButton(){
+		play_button.SetActive(true);
+		rules_button.SetActive(true);
+		ok_button.SetActive (false);
+		rules_text.SetActive (false);
 	}
 }
