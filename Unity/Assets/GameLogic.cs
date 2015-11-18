@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour {
 
@@ -11,7 +12,8 @@ public class GameLogic : MonoBehaviour {
 	public bool turn = false; 	//false is player, true is AI
 	public bool XO = false;
 
-	float time_left = 10.0f;
+	public Text turn_display;
+
 	float turn_start_time; 
 
 	// Use this for initialization
@@ -24,13 +26,20 @@ public class GameLogic : MonoBehaviour {
 			}			
 		}
 		turn_start_time = Time.time;	
+		turn_display = GetComponent<Text>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
-		if (Time.time - turn_start_time >= 3.0f)
+		if (XO) {
+			turn_display.text = "O's turn, " + (3 - (Time.time - turn_start_time));
+		} else {
+			turn_display.text = "X's turn, " + (3 - (Time.time - turn_start_time));
+		}
+		if (Time.time - turn_start_time >= 3.0f){
 			Debug.Log ("time's up");
+			turn_start_time = Time.time;
+		}
 	}
 
 	public void spaceClicked(GameObject spaceClicked){
@@ -48,11 +57,14 @@ public class GameLogic : MonoBehaviour {
 		if(XO){	//O
 			Debug.Log ("user put an O down at space " + int.Parse (spaceClicked.name));
 			space_map[space_number] = "O";
+			spaceClicked.GetComponentInChildren<Text>().text = "O";
 
 		}
 		else{	//X
 			Debug.Log ("user put a X down at space " + int.Parse (spaceClicked.name) );			
 			space_map[space_number] = "X";
+			spaceClicked.GetComponentInChildren<Text>().text = "X";
+
 
 		}
 
@@ -71,30 +83,46 @@ public class GameLogic : MonoBehaviour {
 
 		//check for big horizontal win
 		for (int i = 0; i<=3; i++) {
+
 			if(space_value[i, 0].Equals(space_value[i, 1]) && space_value[i, 0].Equals(space_value[i, 2])
 			   && space_value[i, 0].Equals(space_value[i, 3])){
-				Debug.Log ("Horizontal big win at row " + i + " for " + XO + " (false is x)");
+				if(space_value[i, 0].Equals("") || space_value[i, 1].Equals("") || space_value[i, 2].Equals("") || space_value[i, 3].Equals("")){
 
+				}else{
+					Debug.Log ("Horizontal big win at row " + i + " for " + XO + " (false is x)");
+				}
 			}
 		}
 
 		//check for big vertical win
 		for (int i = 0; i<=3; i++) {
+		
 			if(space_value[0, i].Equals(space_value[1, i]) && space_value[0, i].Equals(space_value[2, i])
 			   && space_value[0, i].Equals(space_value[3, i])){
-				Debug.Log ("Vertical win at column " + i + " for " + XO + " (false is x)");
-
+					if(space_value[0, i].Equals("") || space_value[1, i].Equals("") || space_value[2, i].Equals("") || space_value[3, i].Equals("")){
+						
+					}else{	
+						Debug.Log ("Vertical win at column " + i + " for " + XO + " (false is x)");
+					}
 			}
 		}
 
 		//check for big diagonal win
 		if (space_value [0, 0].Equals (space_value [1, 1]) && space_value [0, 0].Equals (space_value [2, 2])
 			&& space_value [0, 0].Equals (space_value [3, 3])) {
-			Debug.Log ("Diagonal Big Win for " + XO);
+			if(space_value[0, 0].Equals("") || space_value[1, 1].Equals("") || space_value[2, 2].Equals("") || space_value[3, 3].Equals("")){
+
+			}else{	
+				Debug.Log ("Diagonal Big Win for " + XO);
+			}
 		}
 		if (space_value [0, 3].Equals (space_value [1, 2]) && space_value [0, 3].Equals (space_value [2, 1])
 		    && space_value [0, 3].Equals (space_value [3, 0])) {
-			Debug.Log ("Diagonal Big Win for " + XO);
+			if(space_value[0, 3].Equals("") || space_value[1, 2].Equals("") || space_value[2, 1].Equals("") || space_value[3, 0].Equals("")){
+				
+			}else{	
+				Debug.Log ("Diagonal Big Win for " + XO);
+			}
 		}
 
 		XO = !XO;

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MenuManager : MonoBehaviour {
 
-	public bool X_or_O;	//false for X, true for O
+
 
 	// Use this for initialization
 	void Start () {
