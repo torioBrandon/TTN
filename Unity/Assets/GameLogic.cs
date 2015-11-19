@@ -23,6 +23,8 @@ public class GameLogic : MonoBehaviour {
 	public static int player_one_score = 0;
 	public static int player_two_score = 0;
 
+	static float match_time = 30.0f;
+
 
 	float turn_start_time; 
 
@@ -65,13 +67,13 @@ public class GameLogic : MonoBehaviour {
 		}
 		//place the X or O
 		if(XO){	//O
-			Debug.Log ("user put an O down at space " + int.Parse (spaceClicked.name));
+			//Debug.Log ("user put an O down at space " + int.Parse (spaceClicked.name));
 			space_map[space_number] = "O";
 			spaceClicked.GetComponentInChildren<Text>().text = "O";
 
 		}
 		else{	//X
-			Debug.Log ("user put a X down at space " + int.Parse (spaceClicked.name) );			
+			//Debug.Log ("user put a X down at space " + int.Parse (spaceClicked.name) );			
 			space_map[space_number] = "X";
 			spaceClicked.GetComponentInChildren<Text>().text = "X";
 
@@ -91,6 +93,12 @@ public class GameLogic : MonoBehaviour {
 
 		int same_row_values = 0;
 		int same_col_values = 0;
+		int same_diagonal_rl = 0;
+		int same_diagonal_lr = 0;
+
+		bool diagonal_big_win_rl = false;
+		bool diagonal_big_win_lr = false;
+
 		bool[] col_small_win = new bool[4];
 		bool[] row_small_win = new bool[4];
 		bool[] col_big_win = new bool[4];
@@ -99,49 +107,120 @@ public class GameLogic : MonoBehaviour {
 		int col = Mathf.CeilToInt (space_number % 4);
 		int row = Mathf.CeilToInt (space_number / 4);
 
-		if (XO) {	//last move was O's
+		if (!XO) {	//
 			for (int i = 0; i<=3; i++) {
-				if (space_value [row, i].Equals ("O")) {
+				if (space_value [row, i].Equals ("X")) {
 					same_col_values++;
+				}else{
+					if(i == 1 || i == 2)
+						same_col_values = 0;
 				}
 			}
 			if (same_col_values == 3) {	//small win at row row
-				if(!row_small_win[row]){
+				if(!row_small_win[row] && !row_big_win[row]){
 					player_two_score++;
 					row_small_win[row] = true;
 				}
 
 			}
 			if (same_col_values == 4) {
-				if(!row_big_win[row]{
+				if(!row_big_win[row]){
 					player_two_score += 4;
 					row_big_win[row] = true;
 				}
 			}
 		}
-				/*
-		if(!XO){	//last move was X's
-			for (int j = 0; j<=3; j++) {
-				if (space_value [row, j].Equals ("X")){
+		if (!XO) {	//last move was O's
+			for (int i = 0; i<=3; i++) {
+				if (space_value [i , col].Equals ("X")) {
+					same_row_values++;
+				}else{
+					if(i == 1 || i == 2)
+						same_row_values = 0;
+				}
+			}
+			if (same_row_values == 3) {	//small win at row row
+				if(!col_small_win[col] && !col_big_win[col]){
+					player_two_score++;
+					col_small_win[col] = true;
+				}
+				
+			}
+			if (same_row_values == 4) {
+				if(!col_big_win[col]){
+					player_two_score += 4;
+					col_big_win[col] = true;
+				}
+			}
+		}
+		//big diagonal win right to left check for x
+		if (!XO) {
+			for(int i = 0; i<4; i++){
+				if(space_value[i, i].Equals("X")){
+					same_diagonal_rl++;
+				}
+			}
+			if(same_diagonal_rl == 4 && !diagonal_big_win_rl){
+				diagonal_big_win_rl = true;
+				player_two_score+=4;
+			}
+		}
+
+		
+
+
+		if (XO) {	//
+			for (int i = 0; i<=3; i++) {
+				if (space_value [row, i].Equals ("O")) {
 					same_col_values++;
+				}else{
+					if(i == 1 || i == 2)
+						same_col_values = 0;
 				}
 			}
 			if (same_col_values == 3) {	//small win at row row
-				if(!row_small_win[row]){
-					player_two_score++;
+				if(!row_small_win[row] && !row_big_win[row]){
+					player_one_score++;
 					row_small_win[row] = true;
 				}
-					
+				
 			}
 			if (same_col_values == 4) {
-				if(!row_big_win[row]{
-					player_two_score += 4;
+				if(!row_big_win[row]){
+					player_one_score += 4;
 					row_big_win[row] = true;
 				}
 			}
-		}*/
+		}
+		if (XO) {	//last move was O's
+			for (int i = 0; i<=3; i++) {
+				if (space_value [i , col].Equals ("O")) {
+					same_row_values++;
+				}else{
+					if(i == 1 || i == 2)
+						same_row_values = 0;
+				}
+			}
+			if (same_row_values == 3) {	//small win at row row
+				if(!col_small_win[col] && !col_big_win[col]){
+					player_one_score++;
+					col_small_win[col] = true;
+				}
+				
+			}
+			if (same_row_values == 4) {
+				if(!col_big_win[col]){
+					player_one_score += 4;
+					col_big_win[col] = true;
+				}
+			}
+		}
+
+		
+
 
 		same_col_values = 0;
+		same_row_values = 0;
 
 		XO = !XO;
 		turn_start_time = Time.time;
@@ -165,4 +244,3 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 }
-
