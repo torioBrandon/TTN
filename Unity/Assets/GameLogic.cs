@@ -10,6 +10,9 @@ public class GameLogic : MonoBehaviour {
 	public GameObject o_score_display;
 	public GameObject x_score_display;
 
+	public bool[] won_rows = new bool[4];
+	public bool[] won_columns = new bool[4];
+
 	static int turns_taken;
 
 	public string[,] space_value;
@@ -79,75 +82,66 @@ public class GameLogic : MonoBehaviour {
 
 		space_value [Mathf.CeilToInt (space_number / 4), Mathf.CeilToInt (space_number % 4)] = (string)space_map [space_number];
 
-		checkForWin ();
+		checkForWin (space_number);
 		
 	}
 
 	//called whenever a player clicks a space
-	public bool checkForWin(){
+	public bool checkForWin(int space_number){
 
-		//check for big horizontal win
-		for (int i = 0; i<=3; i++) {
-			if(space_value[i, 0].Equals(space_value[i, 1]) && space_value[i, 0].Equals(space_value[i, 2])
-			   && space_value[i, 0].Equals(space_value[i, 3])){
-				if(space_value[i, 0].Equals("") || space_value[i, 1].Equals("") || space_value[i, 2].Equals("") || space_value[i, 3].Equals("")){
+		int same_row_values = 0;
+		int same_col_values = 0;
+		bool[] col_small_win = new bool[4];
+		bool[] row_small_win = new bool[4];
+		bool[] col_big_win = new bool[4];
+		bool[] row_big_win = new bool[4];
 
-				}else{
-					Debug.Log ("Horizontal big win at row " + i + " for " + XO + " (false is x)");
-					if(XO){
-						player_two_score+=4;
-					}else{
-						player_one_score+=4;
-					}
+		int col = Mathf.CeilToInt (space_number % 4);
+		int row = Mathf.CeilToInt (space_number / 4);
+
+		if (XO) {	//last move was O's
+			for (int i = 0; i<=3; i++) {
+				if (space_value [row, i].Equals ("O")) {
+					same_col_values++;
+				}
+			}
+			if (same_col_values == 3) {	//small win at row row
+				if(!row_small_win[row]){
+					player_two_score++;
+					row_small_win[row] = true;
+				}
+
+			}
+			if (same_col_values == 4) {
+				if(!row_big_win[row]{
+					player_two_score += 4;
+					row_big_win[row] = true;
 				}
 			}
 		}
-
-		//check for big vertical win
-		for (int i = 0; i<=3; i++) {		
-			if(space_value[0, i].Equals(space_value[1, i]) && space_value[0, i].Equals(space_value[2, i])
-			   && space_value[0, i].Equals(space_value[3, i])){
-					if(space_value[0, i].Equals("") || space_value[1, i].Equals("") || space_value[2, i].Equals("") || space_value[3, i].Equals("")){
-						
-					}else{	
-						if(XO){
-							player_two_score+=4;
-						}else{
-							player_one_score+=4;
-						}
-						Debug.Log ("Vertical win at column " + i + " for " + XO + " (false is x)");
-					}
-			}
-		}
-
-		//check for big diagonal win
-		if (space_value [0, 0].Equals (space_value [1, 1]) && space_value [0, 0].Equals (space_value [2, 2])
-			&& space_value [0, 0].Equals (space_value [3, 3])) {
-			if(space_value[0, 0].Equals("") || space_value[1, 1].Equals("") || space_value[2, 2].Equals("") || space_value[3, 3].Equals("")){
-
-			}else{	
-				if(XO){
-					player_two_score+=4;
-				}else{
-					player_one_score+=4;
+				/*
+		if(!XO){	//last move was X's
+			for (int j = 0; j<=3; j++) {
+				if (space_value [row, j].Equals ("X")){
+					same_col_values++;
 				}
-				Debug.Log ("Diagonal Big Win for " + XO);
 			}
-		}
-		if (space_value [0, 3].Equals (space_value [1, 2]) && space_value [0, 3].Equals (space_value [2, 1])
-		    && space_value [0, 3].Equals (space_value [3, 0])) {
-			if(space_value[0, 3].Equals("") || space_value[1, 2].Equals("") || space_value[2, 1].Equals("") || space_value[3, 0].Equals("")){
-				
-			}else{	
-				if(XO){
-					player_two_score+=4;
-				}else{
-					player_one_score+=4;
+			if (same_col_values == 3) {	//small win at row row
+				if(!row_small_win[row]){
+					player_two_score++;
+					row_small_win[row] = true;
 				}
-				Debug.Log ("Diagonal Big Win for " + XO);
+					
 			}
-		}
+			if (same_col_values == 4) {
+				if(!row_big_win[row]{
+					player_two_score += 4;
+					row_big_win[row] = true;
+				}
+			}
+		}*/
 
+		same_col_values = 0;
 
 		XO = !XO;
 		turn_start_time = Time.time;
