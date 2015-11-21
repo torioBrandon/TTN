@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour {
 
+	public GameObject X_BG;
+
 	public GameObject[] spaces; 
 	public bool[] usedSpaces;
 	public GameObject turn_display;
@@ -38,23 +40,27 @@ public class GameLogic : MonoBehaviour {
 			}			
 		}
 		turn_start_time = Time.time;	
-	//	turn_display = GetComponent<Text>();
 	}
 	
-	// Update is called once per frame
 	void Update () {
+
 		o_score_display.GetComponentInChildren<Text> ().text = "O Score: " + player_one_score;
 		x_score_display.GetComponentInChildren<Text> ().text = "X Score: " + player_two_score;
 
 		if (XO) {
 			turn_display.GetComponentInChildren<Text>().text = "O's turn, " + Mathf.Round((3 - (Time.time - turn_start_time)) * 100f)/100f;
+			X_BG.SetActive(false);
 		} else {
 			turn_display.GetComponentInChildren<Text>().text = "X's turn, " + Mathf.Round((3 - (Time.time - turn_start_time)) * 100f)/100f;
+			X_BG.SetActive(true);
 		}
 		if (Time.time - turn_start_time >= 3.0f){
 			Debug.Log ("time's up");
 			turn_start_time = Time.time;
 			XO =! XO;
+		}
+		if (Time.time >= 30) {
+			Application.LoadLevel ("TTN Match_Over");
 		}
 	}
 
@@ -63,6 +69,8 @@ public class GameLogic : MonoBehaviour {
 		int space_number = int.Parse(spaceClicked.name);	//use the name of the game object to index the array
 		if (usedSpaces [space_number]) {
 			Debug.Log("space already used");
+			XO = !XO;
+			turn_start_time = Time.time;
 			return; 
 		}
 		//place the X or O
@@ -70,13 +78,14 @@ public class GameLogic : MonoBehaviour {
 			//Debug.Log ("user put an O down at space " + int.Parse (spaceClicked.name));
 			space_map[space_number] = "O";
 			spaceClicked.GetComponentInChildren<Text>().text = "O";
+			spaceClicked.GetComponentInChildren<Text>().color = Color.blue; 
 
 		}
 		else{	//X
 			//Debug.Log ("user put a X down at space " + int.Parse (spaceClicked.name) );			
 			space_map[space_number] = "X";
 			spaceClicked.GetComponentInChildren<Text>().text = "X";
-
+			spaceClicked.GetComponentInChildren<Text>().color = Color.red; 
 
 		}
 		turns_taken++;
@@ -93,12 +102,14 @@ public class GameLogic : MonoBehaviour {
 
 		int same_row_values = 0;
 		int same_col_values = 0;
-		int same_diagonal_rl = 0;
-		int same_diagonal_lr = 0;
+
+		int same_diagonal_values = 0;
 
 		bool diagonal_big_win_rl = false;
 		bool diagonal_big_win_lr = false;
 
+		bool[,] diag_small_win = new bool[4,4];
+	
 		bool[] col_small_win = new bool[4];
 		bool[] row_small_win = new bool[4];
 		bool[] col_big_win = new bool[4];
@@ -107,7 +118,50 @@ public class GameLogic : MonoBehaviour {
 		int col = Mathf.CeilToInt (space_number % 4);
 		int row = Mathf.CeilToInt (space_number / 4);
 
-		if (!XO) {	//
+		int min = Mathf.Min (col, row);
+	
+		int n = Mathf.Min (row, 3 - col);
+
+		//left to right diagonal checking
+		if (!XO) {
+			for (int i = 0; i<=min; i++) {
+				if(space_value[row - min + i, col - min + i].Equals("X")){
+					same_diagonal_values++;
+				}else{
+					if((row-min + i == 1 && col - min + i == 1) || (row-min + i == 2 && col-min + i == 2))
+						same_diagonal_values = 0; 
+				}
+			}
+			if(same_diagonal_values == 3 && !diag_small_win[row-min, col-min]){ //small diagonal win
+				diag_small_win[row-min, col-min] = true;
+				player_two_score++;
+			}
+
+			if(same_diagonal_values == 4 && !diagonal_big_win_rl){
+				player_two_score+=4;
+				diagonal_big_win_rl = true; 
+			}
+		}
+		same_diagonal_values = 0;
+
+		//right to left diagonal checking 
+		if(!XO){
+			for(int i = 0; i<= n; i++)
+				if(space_value[row-n+i ,col+n-i ].Equals("X")){
+					same_diagonal_values++;
+					//Debug.Log((row-min+i) + ", " + (col + min - i));
+				}
+			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){
+					diag_small_win[row-n, col+n] = true;
+					player_two_score++;
+				}
+				if(same_diagonal_values == 4 && !diagonal_big_win_lr){
+					diagonal_big_win_lr = true;
+					player_two_score+=4;
+				}
+		}
+
+		if (!XO) {	
 			for (int i = 0; i<=3; i++) {
 				if (space_value [row, i].Equals ("X")) {
 					same_col_values++;
@@ -153,21 +207,9 @@ public class GameLogic : MonoBehaviour {
 				}
 			}
 		}
-		//big diagonal win right to left check for x
-		if (!XO) {
-			for(int i = 0; i<4; i++){
-				if(space_value[i, i].Equals("X")){
-					same_diagonal_rl++;
-				}
-			}
-			if(same_diagonal_rl == 4 && !diagonal_big_win_rl){
-				diagonal_big_win_rl = true;
-				player_two_score+=4;
-			}
-		}
 
-		
 
+		//O WIN CHECKING///
 
 		if (XO) {	//
 			for (int i = 0; i<=3; i++) {
@@ -215,6 +257,46 @@ public class GameLogic : MonoBehaviour {
 				}
 			}
 		}
+		//left to right diagonal checking
+		if (XO) {
+			for (int i = 0; i<=min; i++) {
+				if(space_value[row - min + i, col - min + i].Equals("O")){
+					same_diagonal_values++;
+				}else{
+					if((row-min + i == 1 && col - min + i == 1) || (row-min + i == 2 && col-min + i == 2))
+						same_diagonal_values = 0; 
+				}
+			}
+			if(same_diagonal_values == 3 && !diag_small_win[row-min, col-min]){ //small diagonal win
+				diag_small_win[row-min, col-min] = true;
+				player_one_score++;
+			}
+			
+			if(same_diagonal_values == 4 && !diagonal_big_win_rl){
+				player_one_score+=4;
+				diagonal_big_win_rl = true; 
+			}
+		}
+		same_diagonal_values = 0;		
+		//right to left diagonal checking 
+		if(XO){
+			for(int i = 0; i<= n; i++)
+			if(space_value[row-n+i ,col+n-i ].Equals("O")){
+				same_diagonal_values++;
+				//Debug.Log((row-min+i) + ", " + (col + min - i));
+			}else{
+				if((row-n+i == 1 && col+n-i == 1) || (row-n+i == 1 && col+n-i == 1))
+					same_diagonal_values = 0;
+			}
+			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){
+				diag_small_win[row-n, col+n] = true;
+				player_one_score++;
+			}
+			if(same_diagonal_values == 4 && !diagonal_big_win_lr){
+				diagonal_big_win_lr = true;
+				player_one_score+=4;
+			}
+		}
 
 		
 
@@ -224,8 +306,9 @@ public class GameLogic : MonoBehaviour {
 
 		XO = !XO;
 		turn_start_time = Time.time;
-		if (turns_taken == 16)
+		if (turns_taken % 16 == 0) {
 			clearBoard ();
+		}
 		return true;
 	}
 
