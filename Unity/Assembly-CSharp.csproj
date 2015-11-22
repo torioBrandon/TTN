@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Choice_Manager.cs" />
+     <Compile Include="Assets\EndScreenManager.cs" />
      <Compile Include="Assets\GameLogic.cs" />
      <Compile Include="Assets\MenuManager.cs" />
  <Reference Include="UnityEngine.UI">

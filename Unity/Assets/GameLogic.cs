@@ -11,9 +11,9 @@ public class GameLogic : MonoBehaviour {
 	public GameObject turn_display;
 	public GameObject o_score_display;
 	public GameObject x_score_display;
+	public GameObject time_left_display;
 
-	public bool[] won_rows = new bool[4];
-	public bool[] won_columns = new bool[4];
+
 
 	static int turns_taken;
 
@@ -25,13 +25,15 @@ public class GameLogic : MonoBehaviour {
 	public static int player_one_score = 0;
 	public static int player_two_score = 0;
 
-	static float match_time = 30.0f;
+	static float match_time;
 
+	//static void reset_game ();
 
 	float turn_start_time; 
 
 	// Use this for initialization
 	void Start () {
+		match_time = Time.time;
 		XO = Choice_Manager.X_or_O;
 		space_value = new string[4,4];
 		for (int i = 0; i<=3; i++) {
@@ -44,22 +46,24 @@ public class GameLogic : MonoBehaviour {
 	
 	void Update () {
 
+		time_left_display.GetComponentInChildren<Text> ().text = "Time left in match: " + (30 - (int)(Time.time - match_time));
+
 		o_score_display.GetComponentInChildren<Text> ().text = "O Score: " + player_one_score;
 		x_score_display.GetComponentInChildren<Text> ().text = "X Score: " + player_two_score;
 
 		if (XO) {
-			turn_display.GetComponentInChildren<Text>().text = "O's turn, " + Mathf.Round((3 - (Time.time - turn_start_time)) * 100f)/100f;
+			turn_display.GetComponentInChildren<Text>().text = "O's turn " + (int)Mathf.Round((Choice_Manager.turn_duration - (Time.time - turn_start_time)));
 			X_BG.SetActive(false);
 		} else {
-			turn_display.GetComponentInChildren<Text>().text = "X's turn, " + Mathf.Round((3 - (Time.time - turn_start_time)) * 100f)/100f;
+			turn_display.GetComponentInChildren<Text>().text = "X's turn " + (int)Mathf.Round((Choice_Manager.turn_duration - (Time.time - turn_start_time)));
 			X_BG.SetActive(true);
 		}
-		if (Time.time - turn_start_time >= 3.0f){
+		if (Time.time - turn_start_time >= Choice_Manager.turn_duration){
 			Debug.Log ("time's up");
 			turn_start_time = Time.time;
 			XO =! XO;
 		}
-		if (Time.time >= 30) {
+		if (Time.time - match_time >= 30) {
 			Application.LoadLevel ("TTN Match_Over");
 		}
 	}
@@ -160,7 +164,7 @@ public class GameLogic : MonoBehaviour {
 					player_two_score+=4;
 				}
 		}
-
+		//row checking
 		if (!XO) {	
 			for (int i = 0; i<=3; i++) {
 				if (space_value [row, i].Equals ("X")) {
@@ -184,7 +188,8 @@ public class GameLogic : MonoBehaviour {
 				}
 			}
 		}
-		if (!XO) {	//last move was O's
+		//column checking
+		if (!XO) {	
 			for (int i = 0; i<=3; i++) {
 				if (space_value [i , col].Equals ("X")) {
 					same_row_values++;
@@ -211,7 +216,7 @@ public class GameLogic : MonoBehaviour {
 
 		//O WIN CHECKING///
 
-		if (XO) {	//
+		if (XO) {	
 			for (int i = 0; i<=3; i++) {
 				if (space_value [row, i].Equals ("O")) {
 					same_col_values++;
@@ -298,11 +303,8 @@ public class GameLogic : MonoBehaviour {
 			}
 		}
 
-		
-
-
-		same_col_values = 0;
-		same_row_values = 0;
+		//same_col_values = 0;
+		//same_row_values = 0;
 
 		XO = !XO;
 		turn_start_time = Time.time;
@@ -325,5 +327,9 @@ public class GameLogic : MonoBehaviour {
 				space_value[i, j] = "";
 			}			
 		}
+	}
+
+	 void reset_game(){
+
 	}
 }

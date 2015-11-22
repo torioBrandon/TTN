@@ -20,7 +20,7 @@ public class MenuManager : MonoBehaviour {
 	}
 
 	public void switchScene(){
-		Application.LoadLevel ("TTN Gameplay");
+		Application.LoadLevel ("TTN Setup");
 	}
 
 	public void showRules(){
