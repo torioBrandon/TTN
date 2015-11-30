@@ -10,8 +10,8 @@ public class EndScreenManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		player_one_display.GetComponentInChildren<Text> ().text = "X score: " + GameLogic.player_one_score;
-		player_two_display.GetComponentInChildren<Text> ().text = "O score: " + GameLogic.player_two_score;
+		player_one_display.GetComponentInChildren<Text> ().text = "O score: " + GameLogic.player_one_score;
+		player_two_display.GetComponentInChildren<Text> ().text = "X score: " + GameLogic.player_two_score;
 	}
 	
 	// Update is called once per frame
@@ -20,7 +20,8 @@ public class EndScreenManager : MonoBehaviour {
 	}
 
 	public void playAgain(){
+		GameLogic.player_one_score = 0;
+		GameLogic.player_two_score = 0;
 		Application.LoadLevel ("TTN");
-
 	}
 }

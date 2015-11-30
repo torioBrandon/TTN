@@ -11,6 +11,8 @@ public class Choice_Manager : MonoBehaviour {
 	public static int turn_duration;
 	public GameObject turn_duration_input;
 
+	bool other_value_set;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -23,4 +25,9 @@ public class Choice_Manager : MonoBehaviour {
 		Application.LoadLevel ("TTN Gameplay");
 		//return s;
 	}
+
+	public void setMatchDuration(){
+		if(other_value_set
+	}
 }
+
