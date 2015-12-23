@@ -13,8 +13,6 @@ public class GameLogic : MonoBehaviour {
 	public GameObject x_score_display;
 	public GameObject time_left_display;
 
-
-
 	static int turns_taken;
 
 	public string[,] space_value;
@@ -32,7 +30,10 @@ public class GameLogic : MonoBehaviour {
 	float turn_start_time; 
 
 	// Use this for initialization
-	void Start () {
+	void Start () {	
+		player_one_score = 0;
+		player_two_score = 0;
+		turns_taken = 0;
 		match_time = Time.time;
 		XO = Choice_Manager.X_or_O;
 		space_value = new string[4,4];
@@ -46,7 +47,7 @@ public class GameLogic : MonoBehaviour {
 	
 	void Update () {
 
-		time_left_display.GetComponentInChildren<Text> ().text = "Time left in match: " + (30 - (int)(Time.time - match_time));
+		time_left_display.GetComponentInChildren<Text> ().text = "Time left in match: " + (Choice_Manager.match_duration - (int)(Time.time - match_time));
 
 		o_score_display.GetComponentInChildren<Text> ().text = "O Score: " + player_one_score;
 		x_score_display.GetComponentInChildren<Text> ().text = "X Score: " + player_two_score;
@@ -63,7 +64,7 @@ public class GameLogic : MonoBehaviour {
 			turn_start_time = Time.time;
 			XO =! XO;
 		}
-		if (Time.time - match_time >= 30) {
+		if (Time.time - match_time >= Choice_Manager.match_duration) {
 			Application.LoadLevel ("TTN Match_Over");
 		}
 	}
@@ -126,6 +127,7 @@ public class GameLogic : MonoBehaviour {
 	
 		int n = Mathf.Min (row, 3 - col);
 
+		//	X WIN CHECKING	//
 		//left to right diagonal checking
 		if (!XO) {
 			for (int i = 0; i<=min; i++) {
@@ -150,11 +152,15 @@ public class GameLogic : MonoBehaviour {
 
 		//right to left diagonal checking 
 		if(!XO){
-			for(int i = 0; i<= n; i++)
+			for(int i = 0; i<= n; i++){
 				if(space_value[row-n+i ,col+n-i ].Equals("X")){
 					same_diagonal_values++;
 					//Debug.Log((row-min+i) + ", " + (col + min - i));
+				} else {
+					if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
+						same_diagonal_values = 0;
 				}
+			}
 			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){
 					diag_small_win[row-n, col+n] = true;
 					player_two_score++;
@@ -284,14 +290,15 @@ public class GameLogic : MonoBehaviour {
 		}
 		same_diagonal_values = 0;		
 		//right to left diagonal checking 
-		if(XO){
-			for(int i = 0; i<= n; i++)
-			if(space_value[row-n+i ,col+n-i ].Equals("O")){
-				same_diagonal_values++;
-				//Debug.Log((row-min+i) + ", " + (col + min - i));
-			}else{
-				if((row-n+i == 1 && col+n-i == 1) || (row-n+i == 1 && col+n-i == 1))
-					same_diagonal_values = 0;
+		if (XO) {
+			for (int i = 0; i<= n; i++){
+				if (space_value [row - n + i, col + n - i].Equals ("O")) {
+					same_diagonal_values++;
+					Debug.Log ((row - n + i) + ", " + (col + n - i));
+				} else {
+					if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
+						same_diagonal_values = 0;
+				}
 			}
 			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){
 				diag_small_win[row-n, col+n] = true;
@@ -303,10 +310,7 @@ public class GameLogic : MonoBehaviour {
 			}
 		}
 
-		//same_col_values = 0;
-		//same_row_values = 0;
-
-		XO = !XO;
+		XO = !XO;	//switch turns
 		turn_start_time = Time.time;
 		if (turns_taken % 16 == 0) {
 			clearBoard ();
