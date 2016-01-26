@@ -124,6 +124,7 @@ public class GameLogic : MonoBehaviour {
 		int row = Mathf.CeilToInt (space_number / 4);
 
 		int min = Mathf.Min (col, row);
+
 	
 		int n = Mathf.Min (row, 3 - col);
 
@@ -152,6 +153,17 @@ public class GameLogic : MonoBehaviour {
 
 		//right to left diagonal checking 
 		if(!XO){
+			if(row == 0 && col == 0){
+				for(int i = 0; i<=3; i++){
+					if(space_value[row+i ,col+i ].Equals("X")){
+						same_diagonal_values++;
+						//Debug.Log((row-min+i) + ", " + (col + min - i));
+					} else {
+						if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
+							same_diagonal_values = 0;
+					}
+				}
+			}else{
 			for(int i = 0; i<= n; i++){
 				if(space_value[row-n+i ,col+n-i ].Equals("X")){
 					same_diagonal_values++;
@@ -160,6 +172,7 @@ public class GameLogic : MonoBehaviour {
 					if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
 						same_diagonal_values = 0;
 				}
+			}
 			}
 			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){
 					diag_small_win[row-n, col+n] = true;
@@ -291,13 +304,25 @@ public class GameLogic : MonoBehaviour {
 		same_diagonal_values = 0;		
 		//right to left diagonal checking 
 		if (XO) {
-			for (int i = 0; i<= n; i++){
-				if (space_value [row - n + i, col + n - i].Equals ("O")) {
-					same_diagonal_values++;
-					Debug.Log ((row - n + i) + ", " + (col + n - i));
-				} else {
-					if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
-						same_diagonal_values = 0;
+			if(row == 0 && col == 0){
+				for(int i = 0; i<=3; i++){
+					if(space_value[row+i ,col+i ].Equals("X")){
+						same_diagonal_values++;
+						//Debug.Log((row-min+i) + ", " + (col + min - i));
+					} else {
+						if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
+							same_diagonal_values = 0;
+					}
+				}
+			}else{
+				for (int i = 0; i<= n; i++){
+					if (space_value [row - n + i, col + n - i].Equals ("O")) {
+						same_diagonal_values++;
+						Debug.Log ((row - n + i) + ", " + (col + n - i));
+					} else {
+						if ((row - n + i == 1 && col + n - i == 1) || (row - n + i == 1 && col + n - i == 1))
+							same_diagonal_values = 0;
+					}
 				}
 			}
 			if(same_diagonal_values == 3 && !diag_small_win[row-n, col+n]){

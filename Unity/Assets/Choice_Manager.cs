@@ -36,10 +36,21 @@ public class Choice_Manager : MonoBehaviour {
 
 	}
 
+	public void setTurnDurationChoice(GameObject duration){
+		turn_duration = int.Parse (duration.name);
+		turn_duration_input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = duration.name;
+		Debug.Log (turn_duration);
+	}
+
 	public void setMatchDuration(){
 		Debug.Log (match_duration_input.GetComponentInChildren<Text> ().text);
 		match_duration = int.Parse(match_duration_input.GetComponentInChildren<Text> ().text);
 
+	}
+
+	public void setMatchDurationChoice(GameObject duration){
+		match_duration = int.Parse (duration.name);
+		match_duration_input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = duration.name;
 	}
 
 	public void playGame(){
